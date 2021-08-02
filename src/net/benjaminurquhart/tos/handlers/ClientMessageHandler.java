@@ -2,12 +2,12 @@ package net.benjaminurquhart.tos.handlers;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Base64;
+//import java.util.Base64;
 import java.util.stream.Collectors;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+//import javax.crypto.Cipher;
+//import javax.crypto.spec.IvParameterSpec;
+//import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
 
@@ -64,11 +64,19 @@ public class ClientMessageHandler extends MessageHandler {
     	case 82: onUserChoseHypnotistMessage(command); break;
     	case 83: onUserChoseJailorDeathNote(command); break;
     	case 85: onUnityLoginAttempt(command); break;
+    	case 91: onPasswordUpdate(command); break;
     	case 127: onKeepAlive(command); break;
     	default: this.onUnhandledCommand(command); break;
     	}
     }
 
+	private void onPasswordUpdate(byte[] command) {
+		System.out.println("Submitted password update request");
+		if(MessageHandler.debug) {
+			JSONObject json = new JSONObject(new String(Arrays.copyOfRange(command, 1, command.length-1), Charset.forName("UTF-8")));
+			printJSON(json);
+		}
+	}
 	// New Serial Killer ability
 	private void onUserDecidedToBeCautious(byte[] command) {
 		StringTableMessage msg = Game.STRING_TABLE.get("GUI_ROLE_28_TARGETING_X"+(3-command[1])+"_SELF");
@@ -332,12 +340,11 @@ public class ClientMessageHandler extends MessageHandler {
 	}
 	private void onUnityLoginAttempt(byte[] command) {
 		System.out.println("Attemping to log in via Unity...");
-		JSONObject json = new JSONObject(new String(Arrays.copyOfRange(command, 1, command.length-1), Charset.forName("UTF-8")));
-		System.out.println(ANSI.GRAY+"{");
-		for(String key : json.keySet()) {
-			System.out.printf("\t\"%s\":\"%s\"\n", key, json.get(key));
+		if(MessageHandler.debug) {
+			JSONObject json = new JSONObject(new String(Arrays.copyOfRange(command, 1, command.length-1), Charset.forName("UTF-8")));
+			printJSON(json);
 		}
-		System.out.println("}");
+		/*
 		System.out.println("Attempting to decode payload...");
 		try {
 			byte[] payload = Base64.getDecoder().decode(json.getString("payload"));
@@ -356,7 +363,7 @@ public class ClientMessageHandler extends MessageHandler {
 			System.out.println(ANSI.RED+"An error occured:");
 			e.printStackTrace(System.out);
 			System.out.println(ANSI.GRAY);
-		}
+		}*/
 	}
 	private void onKeepAlive(byte[] command) {
 		//onUnhandledCommand(command);
@@ -384,4 +391,11 @@ public class ClientMessageHandler extends MessageHandler {
 		System.out.println("Scrolls: " + Game.insertColors(scrolledRoles, game)+ANSI.GRAY);
 	}
 
+	private void printJSON(JSONObject json) {
+		System.out.println(ANSI.GRAY+"{");
+		for(String key : json.keySet()) {
+			System.out.printf("\t\"%s\":\"%s\"\n", key, json.get(key));
+		}
+		System.out.println("}");
+	}
 }

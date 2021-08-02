@@ -107,14 +107,14 @@ public class ServerMessageHandler extends MessageHandler {
 	                 case 58: onUserBecamePartyHost(command); break;
 	                 case 59: onDefaultFunction(command); break;
 	                 case 60: onDefaultFunction(command); break;
-	                 case 61: onDefaultFunction(command); break;
+	                 case 61: onKickedFromParty(command); break;
 	                 case 62: onUserCanInviteToParty(command); break;
 	                 case 63: onDefaultFunction(command); break;
 	                 case 64: onDefaultFunction(command); break;
 	                 case 65: onDefaultFunction(command); break;
 	                 case 66: onUpdateFriendName(command); break;
 	                 case 67: onDefaultFunction(command); break;
-	                 case 68: onDefaultFunction(command); break;
+	                 case 68: onAccountPasswordUpdate(command); break;
 	                 case 69: onDefaultFunction(command); break;
 	                 case 70: onDefaultFunction(command); break;
 	                 case 71: onJoinRankedQueue(command); break;
@@ -209,7 +209,7 @@ public class ServerMessageHandler extends MessageHandler {
 	                 case 159: onNotifyUsersOfPrivateMessage(command); break;
 	                 case 160: onPrivateMessage(command); break;
 	                 case 161: onEarnedAchievements(command); break;
-	                 case 162: onDefaultFunction(command); break;
+	                 case 162: onAccountProblem(command); break;
 	                 case 163: onSpyNightAbilityMessage(command); break;
 	                 case 164: onOneDayBeforeStalemate(command); break;
 	                 case 165: onPetsChosen(command); break;
@@ -285,6 +285,24 @@ public class ServerMessageHandler extends MessageHandler {
 	    }
 	
 	
+	private void onAccountPasswordUpdate(byte[] command) {
+		if(command[1] == 1) {
+			System.out.printf("%sAccount password updated successfully%s\n", ANSI.RESET, ANSI.GRAY);
+		}
+		else {
+			System.out.printf("%sFailed to update password (0x%2x)%s\n", ANSI.ORANGE, command[1], ANSI.GRAY);
+		}
+	}
+	private void onAccountProblem(byte[] command) {
+		String reason = Game.STRING_TABLE.get("GUI_CONNECTION_STATUS_" + (command[1]-1))
+							.getParsedText()
+							.replaceAll("%u%([^%]+?)%uend%", " ($1) ")
+							.replaceAll("%[^%]+?%", "");
+		System.out.printf("%sAccount problem detected:\n%s%s\n", ANSI.ORANGE, reason, ANSI.GRAY);
+	}
+	private void onKickedFromParty(byte[] command) {
+		System.out.printf("%sKicked from party.%s\n", ANSI.RESET, ANSI.GRAY);
+	}
 	private void onVisibleReferralCodes(byte[] command) {
 		
 	}
